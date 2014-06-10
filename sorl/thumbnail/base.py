@@ -63,6 +63,12 @@ class ThumbnailBackend(object):
         options given. First it will try to get it from the key value store,
         secondly it will create it.
         """
+        # Hack to avoid generating a thumbnail when we only want to get the filename
+        url_only = False
+        if 'url_only' in options:
+            url_only = options['url_only']
+            del options['url_only']
+
         logger.debug('Getting thumbnail for file [%s] at [%s]', file_,
                      geometry_string)
         if file_:
@@ -93,6 +99,9 @@ class ThumbnailBackend(object):
         if cached:
             return cached
         else:
+            # Hack to avoid generating a thumbnail when we only want to get the filename
+            if url_only: return thumbnail
+
             # We have to check exists() because the Storage backend does not
             # overwrite in some implementations.
             # so we make the assumption that if the thumbnail is not cached, it doesn't exist
